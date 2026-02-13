@@ -26,7 +26,7 @@ public class TurretNew extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("pos", getTurretPos());
+    SmartDashboard.putNumber("pos", getTurretPosDegrees());
     SmartDashboard.putNumber("pos1", getEncoder1Pos()*360);
     SmartDashboard.putNumber("pos2", getEncoder2Pos()*360);
     SmartDashboard.putNumber("turret_pos", turret.getPosition().getValueAsDouble()*360);
@@ -43,10 +43,10 @@ public class TurretNew extends SubsystemBase {
 
   }
   public void turretPosInit() {
-    turret.setPosition(getTurretPos());
+    turret.setPosition(getTurretPosDegrees()/360);
   }
 
-  public double getTurretPos() {
+  public double getTurretPosDegrees() {
     double p1 = getEncoder1Pos();
     double p2 = getEncoder2Pos();
 
@@ -54,8 +54,8 @@ public class TurretNew extends SubsystemBase {
       double r1 = (i + p1) * ratio1;
       for (int j = 0; j < e1_teeth; j++) {
         double r2 = (j + p2) * ratio2;
-        if (Math.abs(r1 - r2) < 0.05) {
-          return r1;
+        if (Math.abs(r1 - r2) < 0.01) {
+          return r1*360;
         }
       }
     }
