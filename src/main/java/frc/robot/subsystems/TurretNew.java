@@ -10,10 +10,8 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import yams.*;
 import yams.units.EasyCRT;
 import yams.units.EasyCRTConfig;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class TurretNew extends SubsystemBase {
@@ -41,6 +39,21 @@ public class TurretNew extends SubsystemBase {
     TurretTalonConfigs.MotionMagic.withMotionMagicCruiseVelocity(200*1.5);
 
     turret.getConfigurator().apply(TurretTalonConfigs, 0.050);
+
+    EasyCRTConfig easyCrt = new EasyCRTConfig(
+      () -> edu.wpi.first.units.Units.Rotations.of(getEncoder1Pos()), 
+      () -> edu.wpi.first.units.Units.Rotations.of(getEncoder2Pos())
+    );
+    easyCrt.withCommonDriveGear(
+      /* commonRatio */    21.42, 
+      /* driveGearTeeth */ 100, 
+      /* encoder1Pinion */ 22, 
+      /* encoder2Pinion */ 21
+    );
+    EasyCRT easyCrtSolver = new EasyCRT(easyCrt);
+    easyCrtSolver.getAngleOptional().ifPresent(mechAngle -> {
+    turret.setPosition(mechAngle);
+});
   }
 
   @Override
@@ -73,20 +86,7 @@ public class TurretNew extends SubsystemBase {
   }
 
   public void easyCRTsolver() {
-    EasyCRTConfig easyCrt = new EasyCRTConfig(
-      () -> edu.wpi.first.units.Units.Rotations.of(getEncoder1Pos()), 
-      () -> edu.wpi.first.units.Units.Rotations.of(getEncoder2Pos())
-    );
-    easyCrt.withCommonDriveGear(
-      /* commonRatio */    21.42, 
-      /* driveGearTeeth */ 100, 
-      /* encoder1Pinion */ 22, 
-      /* encoder2Pinion */ 21
-    );
-    EasyCRT easyCrtSolver = new EasyCRT(easyCrt);
-    easyCrtSolver.getAngleOptional().ifPresent(mechAngle -> {
-    turret.setPosition(mechAngle);
-});
+    
   }
 
   // public double getTurretPosDegrees() {
