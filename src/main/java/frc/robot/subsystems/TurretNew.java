@@ -86,34 +86,35 @@ public class TurretNew extends SubsystemBase {
   //   return 0;
   // }
   // AI CODE BUT ITS MORE EFFICIENT AND PROBABLY MORE ACCURATE THAN THE ABOVE NESTED LOOP APPROACH
-  public double getTurretPos() {
-  double p1 = getEncoder1Pos(); // Returns 0.0 to 1.0
-  double p2 = getEncoder2Pos(); // Returns 0.0 to 1.0
+//   public double getTurretPos() {
+//   double p1 = getEncoder1Pos(); // Returns 0.0 to 1.0
+//   double p2 = getEncoder2Pos(); // Returns 0.0 to 1.0
 
-  // 1. Calculate how many "teeth" each sensor thinks it has passed
-  // relative to the start of its own gear.
-  double teeth1 = p1 * e1_teeth; // e.g., 0.5 turns * 21 teeth = 10.5 teeth
-  double teeth2 = p2 * e2_teeth; // e.g., 0.5 turns * 22 teeth = 11.0 teeth
+//   // 1. Calculate how many "teeth" each sensor thinks it has passed
+//   // relative to the start of its own gear.
+//   double teeth1 = p1 * e1_teeth; // e.g., 0.5 turns * 21 teeth = 10.5 teeth
+//   double teeth2 = p2 * e2_teeth; // e.g., 0.5 turns * 22 teeth = 11.0 teeth
 
-  // 2. Use the Chinese Remainder Theorem formula for coprime numbers (21 and 22)
-  // The magic formula for these specific gears is: (22 * a) - (21 * b)
-  double totalTeeth = (e2_teeth * teeth1) - (e1_teeth * teeth2);
+//   // 2. Use the Chinese Remainder Theorem formula for coprime numbers (21 and 22)
+//   // The magic formula for these specific gears is: (22 * a) - (21 * b)
+//   double totalTeeth = (e2_teeth * teeth1) - (e1_teeth * teeth2);
 
-  // 3. Handle the "wrapping" logic (Modulo)
-  // The pattern repeats every 462 teeth (21 * 22). 
-  // If the number is negative, we add 462 to make it positive.
-  double maxTeethRange = e1_teeth * e2_teeth; // 462
-  totalTeeth = totalTeeth % maxTeethRange;
+//   // 3. Handle the "wrapping" logic (Modulo)
+//   // The pattern repeats every 462 teeth (21 * 22). 
+//   // If the number is negative, we add 462 to make it positive.
+//   double maxTeethRange = e1_teeth * e2_teeth; // 462
+//   totalTeeth = totalTeeth % maxTeethRange;
   
-  if (totalTeeth < 0) {
-    totalTeeth += maxTeethRange;
-  }
+//   if (totalTeeth < 0) {
+//     totalTeeth += maxTeethRange;
+//   }
 
-  // 4. Convert total teeth moved into Turret Rotations
-  // The turret has 100 teeth.
-  return totalTeeth / t_teeth;
+//   // 4. Convert total teeth moved into Turret Rotations
+//   // The turret has 100 teeth.
+//   return totalTeeth / t_teeth;
+// }
+
+//   public double getTurretPosDegrees() {
+//     return getTurretPos() * 360;
+// }
 }
-
-  public double getTurretPosDegrees() {
-    return getTurretPos() * 360;
-}}
