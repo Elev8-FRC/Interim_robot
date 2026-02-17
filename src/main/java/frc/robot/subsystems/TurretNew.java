@@ -10,7 +10,9 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
+import yams.*;
+import yams.units.EasyCRT;
+import yams.units.EasyCRTConfig;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -43,10 +45,10 @@ public class TurretNew extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("pos", getTurretPosDegrees());
-    SmartDashboard.putNumber("pos1", getEncoder1Pos()*360);
-    SmartDashboard.putNumber("pos2", getEncoder2Pos()*360);
-    SmartDashboard.putNumber("turret_pos", turret.getPosition().getValueAsDouble()*360);
+    // SmartDashboard.putNumber("pos", getTurretPosDegrees());
+    // SmartDashboard.putNumber("pos1", getEncoder1Pos()*360);
+    // SmartDashboard.putNumber("pos2", getEncoder2Pos()*360);
+    // SmartDashboard.putNumber("turret_pos", turret.getPosition().getValueAsDouble()*360);
     
   }
 
@@ -59,15 +61,32 @@ public class TurretNew extends SubsystemBase {
     return encoder2.getAbsolutePosition().getValueAsDouble();
 
   }
-  public void turretPosInit() {
-    turret.setPosition(getTurretPosDegrees()/360);
-  }
+  // public void turretPosInit() {
+  //   turret.setPosition(getTurretPosDegrees()/360);
+  // }
 
   public void setTurretControl(double anglepos) {
     if (anglepos >= 0 && anglepos <= 500) {
       turret.setControl(motionMagicControl.withPosition(anglepos/360).withSlot(0));
 
     }
+  }
+
+  public void easyCRTsolver() {
+    EasyCRTConfig easyCrt = new EasyCRTConfig(
+      () -> edu.wpi.first.units.Units.Rotations.of(getEncoder1Pos()), 
+      () -> edu.wpi.first.units.Units.Rotations.of(getEncoder2Pos())
+    );
+    easyCrt.withCommonDriveGear(
+      /* commonRatio */    21.42, 
+      /* driveGearTeeth */ 100, 
+      /* encoder1Pinion */ 22, 
+      /* encoder2Pinion */ 21
+    );
+    EasyCRT easyCrtSolver = new EasyCRT(easyCrt);
+    easyCrtSolver.getAngleOptional().ifPresent(mechAngle -> {
+    turret.setPosition(mechAngle);
+});
   }
 
   // public double getTurretPosDegrees() {
