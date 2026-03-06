@@ -4,14 +4,15 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Rotations;
+
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import yams.units.EasyCRT;
-import yams.units.EasyCRTConfig;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class TurretNew extends SubsystemBase {
@@ -40,20 +41,7 @@ public class TurretNew extends SubsystemBase {
 
     turret.getConfigurator().apply(TurretTalonConfigs, 0.050);
 
-    EasyCRTConfig easyCrt = new EasyCRTConfig(
-      () -> edu.wpi.first.units.Units.Rotations.of(getEncoder1Pos()), 
-      () -> edu.wpi.first.units.Units.Rotations.of(getEncoder2Pos())
-    );
-    easyCrt.withCommonDriveGear(
-      /* commonRatio */    21.42, 
-      /* driveGearTeeth */ 100, 
-      /* encoder1Pinion */ 22, 
-      /* encoder2Pinion */ 21
-    );
-    EasyCRT easyCrtSolver = new EasyCRT(easyCrt);
-    easyCrtSolver.getAngleOptional().ifPresent(mechAngle -> {
-    turret.setPosition(mechAngle);
-});
+
   }
 
   @Override
@@ -74,9 +62,9 @@ public class TurretNew extends SubsystemBase {
     return encoder2.getAbsolutePosition().getValueAsDouble();
 
   }
-  // public void turretPosInit() {
-  //   turret.setPosition(getTurretPosDegrees()/360);
-  // }
+  public void turretPosInit() {
+    turret.setPosition(convert_teeth_to_degrees(find_teeth_rotated())/360);
+  }
 
   public void setTurretControl(double anglepos) {
     if (anglepos >= 0 && anglepos <= 500) {
@@ -85,55 +73,16 @@ public class TurretNew extends SubsystemBase {
     }
   }
 
-  public void easyCRTsolver() {
-    
+  public double convert_teeth_to_degrees(double teeth_rotated){
+    double degrees = ((find_teeth_rotated()/100.0) * 360);
+    return degrees;
   }
 
-  // public double getTurretPosDegrees() {
-  //   double p1 = getEncoder1Pos();
-  //   double p2 = getEncoder2Pos();
-
-  //   for (int i = 0; i < e2_teeth; i++) {
-  //     double r1 = (i + p1) * ratio1;
-  //     for (int j = 0; j < e1_teeth; j++) {
-  //       double r2 = (j + p2) * ratio2;
-  //       if (Math.abs(r1 - r2) < 0.01) {
-  //         return r1*360;
-  //       }
-  //     }
-  //   }
-  //   return 0;
-  // }
-  // AI CODE BUT ITS MORE EFFICIENT AND PROBABLY MORE ACCURATE THAN THE ABOVE NESTED LOOP APPROACH
-//   public double getTurretPos() {
-//   double p1 = getEncoder1Pos(); // Returns 0.0 to 1.0
-//   double p2 = getEncoder2Pos(); // Returns 0.0 to 1.0
-
-//   // 1. Calculate how many "teeth" each sensor thinks it has passed
-//   // relative to the start of its own gear.
-//   double teeth1 = p1 * e1_teeth; // e.g., 0.5 turns * 21 teeth = 10.5 teeth
-//   double teeth2 = p2 * e2_teeth; // e.g., 0.5 turns * 22 teeth = 11.0 teeth
-
-//   // 2. Use the Chinese Remainder Theorem formula for coprime numbers (21 and 22)
-//   // The magic formula for these specific gears is: (22 * a) - (21 * b)
-//   double totalTeeth = (e2_teeth * teeth1) - (e1_teeth * teeth2);
-
-//   // 3. Handle the "wrapping" logic (Modulo)
-//   // The pattern repeats every 462 teeth (21 * 22). 
-//   // If the number is negative, we add 462 to make it positive.
-//   double maxTeethRange = e1_teeth * e2_teeth; // 462
-//   totalTeeth = totalTeeth % maxTeethRange;
-  
-//   if (totalTeeth < 0) {
-//     totalTeeth += maxTeethRange;
-//   }
-
-//   // 4. Convert total teeth moved into Turret Rotations
-//   // The turret has 100 teeth.
-//   return totalTeeth / t_teeth;
-// }
-
-//   public double getTurretPosDegrees() {
-//     return getTurretPos() * 360;
-// }
+  public double find_teeth_rotated() {
+    double val =  (462*(getEncoder1Pos()-getEncoder2Pos()));
+    double t = (val%462+462)%462;
+    return t;
+  }
 }
+
+
