@@ -13,6 +13,7 @@ public class shootingLogic extends SubsystemBase {
   public double esty;
   public boolean flag = false;
   public double[] tofs = new double[5];
+  public double sum;
   public shootingLogic() {}
 
 @Override
@@ -46,13 +47,15 @@ while (iter < 5 && (iter < 3 || contraction > contractionThreshold)) {
   prevTof     = tof;
   tof         = interpolationLogic.predictedTOF(estx, esty);
   tofs[iter] = tof;
-  if (!Double.isNaN(prevPrevTof) && Math.abs(prevTof - prevPrevTof) > 1e-6) {
+  sum+=tof;
+    if (!Double.isNaN(prevPrevTof) && Math.abs(prevTof - prevPrevTof) > 1e-6) {
     contraction = Math.abs((tof - prevTof) / (prevTof - prevPrevTof));
   }
 
   iter++;
 }
-posImaginary = new Translation2d(estx, esty);
+sum = sum/tofs.length;
+posImaginary = pos(shootingConstants.x, shootingConstants.y, shootingConstants.velx, shootingConstants.vely, sum, 0, shootingConstants.accelx, shootingConstants.accely);
   }
 }
 //   @Override
