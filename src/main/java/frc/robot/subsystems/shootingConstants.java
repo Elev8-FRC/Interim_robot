@@ -17,6 +17,9 @@ public class shootingConstants extends SubsystemBase {
   public static double accely;
   public static final double hubx = 182.11;
   public static final double huby = 158.84;
+  public static double robotHeading;
+  public static double offsetX = 0.0; // Adjust based on your robot's geometry
+  public static double offsetY = 0.0; // Adjust based on your robot's geometry
   @Override
   public void periodic() {
     

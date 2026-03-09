@@ -7,7 +7,6 @@ package frc.robot.subsystems;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.math.geometry.Translation2d;
 
 
 public class interpolationLogic extends SubsystemBase {
@@ -15,8 +14,7 @@ public class interpolationLogic extends SubsystemBase {
   public static InterpolatingDoubleTreeMap tofmap = new InterpolatingDoubleTreeMap();
   public static InterpolatingDoubleTreeMap rpmMap = new InterpolatingDoubleTreeMap();
   public static InterpolatingDoubleTreeMap hoodMap = new InterpolatingDoubleTreeMap();
-  public static final double hub_x = 182.11;
-  public static final double hub_y = 158.84;
+
   public static double robot_x = 0;
   public static double robot_y = 0;
 
@@ -51,7 +49,7 @@ public class interpolationLogic extends SubsystemBase {
   hoodMap.put(4.0, 16.858);
   hoodMap.put(4.25, 17.73);
   hoodMap.put(4.55, 17.799);
-
+// REAL VALUES NEEDED.
   tofmap.put(1.575, 0.5);
   tofmap.put(2.0, 0.5);  
   tofmap.put(2.25, 0.5);
@@ -70,11 +68,11 @@ public class interpolationLogic extends SubsystemBase {
   public void periodic() {
     SmartDashboard.putNumber("Shooter RPM", predictedRPM());
     SmartDashboard.putNumber("Shooter Hood Angle", predictedHoodAngle());
-    SmartDashboard.putNumber("Shooter TOF", predictedTOF(robot_x, robot_y));
+    SmartDashboard.putNumber("Shooter TOF", predictedTOF(distance(robot_x, robot_y)));
   }
 
   public static double distance(double robot_x, double robot_y){
-    return Math.sqrt(Math.pow((robot_x-hub_x), 2) + Math.pow((robot_y-hub_y), 2))*0.0254;
+    return Math.sqrt(Math.pow((robot_x-shootingConstants.hubx), 2) + Math.pow((robot_y-shootingConstants.huby), 2))*0.0254;
   }
 
   public static double predictedRPM(){
@@ -84,7 +82,7 @@ public class interpolationLogic extends SubsystemBase {
   public static double predictedHoodAngle(){
     return hoodMap.get(distance(robot_x, robot_y));
   }
-  public static double predictedTOF(double x, double y){
-    return tofmap.get(distance(x, y));
+  public static double predictedTOF(double distance){
+    return tofmap.get(distance);
   }
 }
