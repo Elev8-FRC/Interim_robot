@@ -24,6 +24,7 @@ public class TurretNew extends SubsystemBase {
   public double e2_teeth = 22;
   public double ratio1 = e1_teeth / t_teeth;
   public double ratio2 = e2_teeth / t_teeth;
+  public double actually_teeth = 306;
   public MotionMagicDutyCycle motionMagicControl;
   public TurretNew() {
     motionMagicControl = new MotionMagicDutyCycle(0);
@@ -79,8 +80,8 @@ public class TurretNew extends SubsystemBase {
   }
 
   public double find_teeth_rotated() {
-    double val =  (462*(getEncoder1Pos()-getEncoder2Pos()));
-    double t = (val%462+462)%462;
+    double val =  (actually_teeth*(getEncoder1Pos()-getEncoder2Pos()));
+    double t = (val%actually_teeth+actually_teeth)%actually_teeth;
     return t;
   }
 }
